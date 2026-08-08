@@ -133,6 +133,13 @@ struct siglabel {
   int   number;
 };
 
+#ifndef SIGCLD
+// bionic omits the System V alias. "CLD" is one of the names sun.misc.Signal documents, and the
+// alias is the same signal number as SIGCHLD on every Linux ABI, so define it rather than drop the
+// table entry and silently lose the name.
+#define SIGCLD SIGCHLD
+#endif
+
 struct siglabel siglabels[] = {
   /* derived from /usr/include/bits/signum.h on RH7.2 */
    "HUP",       SIGHUP,         /* Hangup (POSIX).  */
