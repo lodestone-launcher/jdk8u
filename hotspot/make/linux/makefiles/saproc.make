@@ -67,11 +67,12 @@ endif
 # if $(AGENT_DIR) does not exist, we don't build SA
 # also, we don't build SA on Itanium or zero.
 
-ifneq ($(wildcard $(AGENT_DIR)),)
-ifneq ($(filter-out ia64 zero,$(SRCARCH)),)
-  BUILDLIBSAPROC = $(LIBSAPROC)
-endif
-endif
+# The Serviceability Agent's debugger back-end is not built for Android. It talks to a live process
+# through libthread_db and to a core file through <sys/procfs.h>, and bionic has neither: no
+# thread_db.h, no prstatus_t. It backs jstack, jmap and jhsdb against a core file, none of which
+# apply on a phone, so it is dropped rather than reimplemented. The Java half (sa-jdi.jar) still
+# builds, because nothing in it is platform-specific.
+BUILDLIBSAPROC =
 
 ifneq ($(ALT_SASRCDIR),)
 ALT_SAINCDIR=-I$(ALT_SASRCDIR) -DALT_SASRCDIR
