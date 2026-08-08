@@ -72,7 +72,11 @@
 # include <pwd.h>
 # include <poll.h>
 # include <ucontext.h>
+#ifndef __BIONIC__
+// glibc-only, and only ever used on the x86 ports: every FPU control-word entry point below is
+// already an empty stub on aarch64.
 # include <fpu_control.h>
+#endif
 
 #define REG_FP 29
 

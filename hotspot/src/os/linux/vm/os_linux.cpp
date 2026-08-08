@@ -96,7 +96,9 @@
 # include <string.h>
 # include <syscall.h>
 # include <sys/sysinfo.h>
+#ifndef __BIONIC__
 # include <gnu/libc-version.h>
+#endif
 # include <sys/ipc.h>
 # include <sys/shm.h>
 # include <link.h>
@@ -596,6 +598,15 @@ void os::Linux::libpthread_init() {
 # define _CS_GNU_LIBPTHREAD_VERSION 3
 # endif
 
+#if defined(__BIONIC__)
+  // Android's confstr() answers neither key, and there is no gnu_get_libc_version() to fall back
+  // on. bionic has no separate pthread library to version either -- threading lives inside libc --
+  // and it behaves the way the code below cares about NPTL behaving: floating stacks and no hard
+  // limit on the thread count.
+  os::Linux::set_glibc_version("bionic - unknown");
+  os::Linux::set_libpthread_version("bionic - unknown");
+  os::Linux::set_is_NPTL();
+#else
   size_t n = confstr(_CS_GNU_LIBC_VERSION, NULL, 0);
   if (n > 0) {
      char *str = (char *)malloc(n, mtInternal);
@@ -637,6 +648,7 @@ void os::Linux::libpthread_init() {
   } else {
      os::Linux::set_is_LinuxThreads();
   }
+#endif
 
   // LinuxThreads have two flavors: floating-stack mode, which allows variable
   // stack size; and fixed-stack mode. NPTL is always floating-stack.
