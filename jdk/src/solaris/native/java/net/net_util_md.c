@@ -35,7 +35,14 @@
 #include <dlfcn.h>
 #include <sys/time.h>
 
-#ifndef _ALLBSD_SOURCE
+#ifdef __BIONIC__
+// <values.h> is a legacy glibc compatibility header bionic does not ship, and MAXINT is the only
+// name this file takes from it.
+#include <limits.h>
+#ifndef MAXINT
+#define MAXINT INT_MAX
+#endif
+#elif !defined(_ALLBSD_SOURCE)
 #include <values.h>
 #else
 #include <limits.h>
