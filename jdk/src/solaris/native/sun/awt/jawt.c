@@ -33,7 +33,13 @@
  */
 JNIEXPORT jboolean JNICALL JAWT_GetAWT(JNIEnv* env, JAWT* awt)
 {
-#if defined(JAVASE_EMBEDDED) && defined(HEADLESS)
+/*
+ * JAVASE_EMBEDDED was the only configuration that ever paired HEADLESS with a build that had no
+ * libawt_xawt, so every other headless build linked libjawt against X11 entry points that were not
+ * there. Headless is the condition that matters: with no windowing system there is no drawing
+ * surface to hand out, whoever left the toolkit out.
+ */
+#if defined(HEADLESS)
     /* there are no AWT libs available at all */
     return JNI_FALSE;
 #else
