@@ -329,7 +329,10 @@ unal_bwd_copy:
         blo     unal_bwd_copy_drain
 
 unal_bwd_copy_again:
-        prfm    pldl1keep, [s, #-256]
+        // prfum, not prfm: the scaled-immediate form only encodes non-negative offsets. GNU as
+        // rewrites a negative prfm to the unscaled encoding silently; clang's integrated
+        // assembler rejects it instead, so the unscaled mnemonic is spelled out.
+        prfum   pldl1keep, [s, #-256]
         str     t1, [d, #-8]
         stp     t3, t0, [d, #-24]
         ldp     t0, t1, [s, #-16]
